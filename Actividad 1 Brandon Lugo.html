@@ -1,0 +1,351 @@
+﻿<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Actividad 1 Calificaciones de alumnos</title>
+    <style>
+        :root {
+            --PrimaryColor: #317DAE;
+            --PrimaryColor2: #0A6DAD
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        h1 {
+            margin: 0;
+            padding: 10px;
+            text-align: center;
+            font-size: 2.5rem;
+            background-color: var(--PrimaryColor);
+            color: white;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 100;
+        }
+
+        .content {
+            flex: 1;
+            padding-top: 80px;
+            padding-bottom: 60px;
+        }
+
+        div.AggAlumno, div.ListaAlumnos, div.Promedio {
+            width: 80%;
+            background-color: lightgray;
+            margin: 10px auto;
+            padding: 10px;
+            border: 2px solid black;
+            border-radius: 15px;
+        }
+
+            div.AggAlumno form {
+                display: grid;
+                grid-template-columns: 1fr;
+                padding: 5px;
+                gap: 10px;
+            }
+
+                div.AggAlumno form input, div.AggAlumno form label {
+                    font-size: 1.2rem;
+                }
+
+        div h2 {
+            text-align: center;
+        }
+
+        .Boton {
+            width: 20%;
+            background-color: var(--PrimaryColor2);
+            color: white;
+            border-radius: 10px;
+            padding: 5px;
+            cursor: pointer;
+            border: none;
+        }
+
+            .Boton:hover {
+                background-color: #085a8c;
+            }
+
+        table {
+            width: 100%;
+            text-align: center;
+            font-size: 1.2rem;
+            margin: 0;
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+
+            table th {
+                background-color: wheat;
+                border: 1px solid black;
+                padding: 10px;
+            }
+
+            table td {
+                background-color: whitesmoke;
+                border: 1px solid black;
+                padding: 10px;
+            }
+
+            table input {
+                border: none;
+                font-size: 1.1rem;
+                background-color: transparent;
+                text-align: center;
+                padding: 5px;
+                width: 90%;
+                outline: none;
+                appearance: none;
+            }
+
+                table input:first-child {
+                    text-align: left;
+                }
+
+        .Promedio {
+            text-align: center;
+        }
+
+        footer {
+            text-align: center;
+            margin: 0;
+            padding: 10px;
+            font-size: 1.3rem;
+            background-color: var(--PrimaryColor);
+            color: white;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+
+        .aprobado {
+            background-color: #90EE90;
+            color: darkgreen;
+            font-weight: bold;
+            padding: 5px;
+            border-radius: 5px;
+        }
+
+        .reprobado {
+            background-color: #FFB6C1;
+            color: darkred;
+            font-weight: bold;
+            padding: 5px;
+            border-radius: 5px;
+        }
+
+        .Eliminar {
+            text-align: center;
+            color: red;
+            font-size: 1.2rem;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+            .Eliminar:hover {
+                font-size: 1.6rem;
+            }
+
+        .estado {
+            font-weight: bold;
+            padding: 8px;
+        }
+
+        .error {
+            border: 2px solid red;
+            background-color: #ffe6e6;
+        }
+    </style>
+</head>
+<body>
+    <h1>Calificaciones</h1>
+
+    <div class="content">
+        <div class="AggAlumno">
+            <h2>Agregar alumnos</h2>
+            <form>
+                <label for="Nombre">Nombre del alumno:</label>
+                <input id="Nombre" name="Alum" required type="text" placeholder="Ingrese el nombre del alumno" />
+                <input id="btnAgg" class="Boton" type="button" value="Agregar alumno" />
+            </form>
+        </div>
+
+        <div class="ListaAlumnos">
+            <h2>Calificaciones</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Calificacion</th>
+                        <th>Estado</th>
+                        <th>Eliminar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="Promedio">
+            <h2>Promedio del grupo:</h2>
+            <h4 id="promedioTexto">-/-</h4>
+            <p id="infoPromedio">Completa las calificaciones para poder obtener las calificaciones del grupo:</p>
+        </div>
+    </div>
+
+    <footer>Pagina creada por Brandon Lugo.</footer>
+
+    <script>
+        const form = document.querySelector("form");
+        const txtNombre = document.getElementById("Nombre");
+        const tabla = document.querySelector("table tbody");
+        const promedioTexto = document.getElementById("promedioTexto");
+        const btnAgregar = document.getElementById("btnAgg");
+        const infoPromedio = document.getElementById("infoPromedio");
+
+        function validarAlumnos() {
+            const alumnos = document.querySelectorAll('input[name="Alumnos"]');
+            const nombre = txtNombre.value;
+
+            if (nombre === "") {
+                txtNombre.classList.add('error');
+                return false;
+            }
+
+            for (let i = 0; i < alumnos.length; i++) {
+                if (alumnos[i].value.trim().toLowerCase() === nombre.toLowerCase()) {
+                    txtNombre.classList.add('error');
+                    return false;
+                }
+            }
+
+            txtNombre.classList.remove('error');
+            return true;
+        }
+
+        function calcularPromedio() {
+            const calificaciones = document.querySelectorAll('input[name="Calificaciones"]');
+            let sumaCalificaciones = 0;
+            let contadorValidos = 0;
+            let hayCalificacionesVacias = false;
+
+            for (let i = 0; i < calificaciones.length; i++) {
+                const valor = calificaciones[i].value.trim();
+
+                if (valor === "") {
+                    hayCalificacionesVacias = true;
+                }
+                else if (parseFloat(valor) >= 0 && parseFloat(valor) <= 100) {
+                    sumaCalificaciones += parseFloat(valor);
+                    contadorValidos++;
+                }
+            }
+
+            if (hayCalificacionesVacias || calificaciones.length === 0) {
+                promedioTexto.textContent = "-/-";
+                infoPromedio.textContent = "Ingrese calificacion en todos los alumnos para poder mostrar el promedio";
+            }
+            else if (contadorValidos === 0) {
+                promedioTexto.textContent = "-/-";
+                infoPromedio.textContent = "Ingrese calificaciones válidas (0-100) para calcular el promedio";
+            }
+            else
+            {
+                const promedio = sumaCalificaciones / contadorValidos;
+                promedioTexto.textContent = promedio.toFixed(2);
+                infoPromedio.textContent = "Promedio calculado";
+            }
+        }
+
+        function actualizarEstado(inputCalificacion) {
+            const calificacion = parseFloat(inputCalificacion.value);
+            const celdaEstado = inputCalificacion.closest('tr').querySelector('.estado');
+
+            celdaEstado.classList.remove('aprobado', 'reprobado');
+
+            if (calificacion >= 0 && calificacion <= 100) {
+                if (calificacion >= 70) {
+                    celdaEstado.textContent = 'Aprobado';
+                    celdaEstado.classList.add('aprobado');
+                }
+                else
+                {
+                    celdaEstado.textContent = 'Reprobado';
+                    celdaEstado.classList.add('reprobado');
+                }
+            }
+            else
+            {
+                celdaEstado.textContent = '';
+            }
+        }
+
+        function eliminarAlumno(botonEliminar) {
+            const fila = botonEliminar.closest('tr');
+            fila.remove();
+            calcularPromedio();
+        }
+
+        btnAgregar.addEventListener("click", () => {
+            if (validarAlumnos()) {
+                const fila = document.createElement('tr');
+                fila.innerHTML = `
+                            <td>
+                                <input type="text"
+                                       value="${txtNombre.value}"
+                                       readonly
+                                       name="Alumnos"
+                                       />
+                            </td>
+                            <td>
+                                <input type="number"
+                                       min="0"
+                                       max="100"
+                                       value=""
+                                       placeholder="0-100"
+                                       name="Calificaciones" />
+                            </td>
+                            <td class="estado"></td>
+                            <td class="Eliminar">
+                                X
+                            </td>
+                        `;
+
+                tabla.appendChild(fila);
+                txtNombre.value = "";
+                txtNombre.classList.remove('error');
+                calcularPromedio();
+            }
+        });
+
+        tabla.addEventListener('change', (e) => {
+            if (e.target.name === 'Calificaciones') {
+                actualizarEstado(e.target);
+                calcularPromedio();
+            }
+        });
+
+        tabla.addEventListener('click', (e) => {
+            if (e.target.classList.contains('Eliminar')) {
+                eliminarAlumno(e.target);
+            }
+        });
+
+        txtNombre.addEventListener('change', () => {
+            if (txtNombre.value !== "") {
+                txtNombre.classList.remove('error');
+            }
+        });
+    </script>
+</body>
+</html>
